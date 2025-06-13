@@ -8,7 +8,7 @@ def get_db_connection():
         host='localhost',
         user='root',
         password='',
-        db='ussd_appeal_system',
+        db='22rp01016_ussd_appeal',
         cursorclass=pymysql.cursors.DictCursor
     )
 
