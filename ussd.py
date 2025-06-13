@@ -8,7 +8,7 @@ def get_db_connection():
         host='localhost',
         user='root',
         password='',
-        db='ussd_appeal_system',
+        db='22rp01016_ussd_appeal',
         cursorclass=pymysql.cursors.DictCursor
     )
 
@@ -22,7 +22,6 @@ def ussd():
     response = ""
     inputs = text.strip().split("*")
 
-    # MAIN MENU
     if text == "":
         response = "CON Welcome to the Marks Appeal System\n"
         response += "1. Check my marks\n"
@@ -30,7 +29,6 @@ def ussd():
         response += "3. Check appeal status\n"
         response += "4. Exit"
 
-    # CHECK MARKS
     elif inputs[0] == "1":
         if len(inputs) == 1:
             response = "CON Enter your Student ID:"
@@ -53,7 +51,6 @@ def ussd():
                         response = "END No marks found."
             conn.close()
 
-    # APPEAL MARKS
     elif inputs[0] == "2":
         if len(inputs) == 1:
             response = "CON Enter your Student ID:"
@@ -67,8 +64,7 @@ def ussd():
                     response = "END No modules found for student."
                 else:
                     menu = "\n".join([f"{i+1}. {m['module_name']} ({m['mark']})" for i, m in enumerate(modules)])
-                    response = f"CON Select module to appeal:\n{menu}"
-                    response += f"\n0. Go Back"
+                    response = f"CON Select module to appeal:\n{menu}\n0. Go Back"
             conn.close()
 
         elif len(inputs) == 3:
@@ -88,8 +84,8 @@ def ussd():
 
         elif len(inputs) == 4:
             student_id = inputs[1].upper()
-            module_name = inputs[3]
             reason = inputs[2]
+            module_name = inputs[3]
             conn = get_db_connection()
             with conn.cursor() as cursor:
                 cursor.execute("""
@@ -100,7 +96,6 @@ def ussd():
                 response = "END Appeal submitted successfully. You will be notified soon."
             conn.close()
 
-    # CHECK APPEAL STATUS
     elif inputs[0] == "3":
         if len(inputs) == 1:
             response = "CON Enter your Student ID:"
@@ -108,11 +103,7 @@ def ussd():
             student_id = inputs[1].upper()
             conn = get_db_connection()
             with conn.cursor() as cursor:
-                cursor.execute("""
-                    SELECT module_name, status
-                    FROM appeals
-                    WHERE student_id = %s
-                """, (student_id,))
+                cursor.execute("SELECT module_name, status FROM appeals WHERE student_id = %s", (student_id,))
                 appeals = cursor.fetchall()
                 if appeals:
                     response = "END Appeal Status:\n"
